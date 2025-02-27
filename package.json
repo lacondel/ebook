@@ -1,0 +1,21 @@
+{
+  "name": "ebook",
+  "version": "1.0.0",
+  "description": "A resource with information about books",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js"
+  },
+  "author": "lacondel",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
