@@ -30,7 +30,7 @@ const getBookById = asyncHandler(async (req, res) => {
 const setBook = asyncHandler(async (req, res) => {
     if (!req.body.title) {
         res.status(400);
-        throw new Error('Please add a text field');
+        throw new Error('Название книги обязательно');
     };
 
     const book = await Book.create({
