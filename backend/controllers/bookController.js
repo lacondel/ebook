@@ -3,7 +3,7 @@ const Book = require('../models/bookModel');
 
 // @desc Get all books
 // @route GET /api/books
-// @access Private
+// @access Public
 const getAllBooks = asyncHandler(async (req, res) => {
     const books = await Book.find();
 
@@ -12,7 +12,7 @@ const getAllBooks = asyncHandler(async (req, res) => {
 
 // @desc Get book by id
 // @route GET /api/books:id
-// @access Private
+// @access Public
 const getBookById = asyncHandler(async (req, res) => {
     const book = await Book.findById(req.params.id);
 

@@ -10,13 +10,14 @@ const {
     getReadlist,
     removeFromReadlist,
     moveToWishlist } = require('../controllers/userController');
+const { protect } = require('../middlewares/authMiddleware');
 
 router.post('/', registerUser);
 router.post('/login', loginUser);
-router.get('/me', getMe);
-router.get('/wishlist', getWishlist);
-router.route('/wishlist/:id').delete(removeFromWishlist).patch(moveToReadlist);
-router.get('/readlist', getReadlist);
-router.route('/readlist/:id').delete(removeFromReadlist).patch(moveToWishlist);
+router.get('/me', protect, getMe);
+router.get('/wishlist', protect, getWishlist);
+router.route('/wishlist/:id').delete(protect, removeFromWishlist).patch(protect, moveToReadlist);
+router.get('/readlist', protect, getReadlist);
+router.route('/readlist/:id').delete(protect, removeFromReadlist).patch(protect, moveToWishlist);
 
 module.exports = router;
