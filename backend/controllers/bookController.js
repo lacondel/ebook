@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Book = require('../models/bookModel');
+const User = require('../models/userModel');
 
 // @desc Get all books
 // @route GET /api/books
@@ -78,10 +79,80 @@ const deleteBook = asyncHandler(async (req, res) => {
     res.status(200).json(req.params.id);
 });
 
+// @desc Add book to user wishlist
+// @route POST /api/books/wishlist:id
+// @access Private
+const addBookToWishlist = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+        res.status(400);
+        throw new Error('Книга не найдена');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+        res.status(400);
+        throw new Error('Пользователь не найден');
+    }
+
+    if (user.wishlist.includes(book._id)) {
+        res.status(400);
+        throw new Error('Книга уже в списке желаний');
+    }
+
+    if (user.readlist.includes(book._id)) {
+        res.status(400);
+        throw new Error('Книга находится в списке прочитанных');
+    }
+
+    user.wishlist.push(book._id);
+    await user.save();
+
+    res.json({ message: 'Книга добавлена в ваш список желаний' });
+});
+
+// @desc Add book to user readlist
+// @route POST /api/books/readlist:id
+// @access Private
+const addBookToReadlist = asyncHandler(async (req, res) => {
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+        res.status(400);
+        throw new Error('Книга не найдена');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+        res.status(400);
+        throw new Error('Пользователь не найден');
+    }
+
+    if (user.readlist.includes(book._id)) {
+        res.status(400);
+        throw new Error('Книга уже в списке прочитанных');
+    }
+
+    if (user.wishlist.includes(book._id)) {
+        res.status(400);
+        throw new Error('Книга находится в списке желаний');
+    }
+
+    user.readlist.push(book._id);
+    await user.save();
+
+    res.json({ message: 'Книга добавлена в ваш список прочитанных' });
+});
+
 module.exports = {
     getAllBooks,
     getBookById,
     setBook,
     updateBook,
-    deleteBook
+    deleteBook,
+    addBookToWishlist,
+    addBookToReadlist
 }
