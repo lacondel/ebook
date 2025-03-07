@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
+const Book = require('../models/bookModel');
 
 // @desc Register new user
 // @route POST /api/users
@@ -81,42 +82,130 @@ const getMe = asyncHandler(async (req, res) => {
 // @route GET /api/users/wishlist
 // @access Private
 const getWishlist = asyncHandler(async (req, res) => {
-    res.json({ message: 'Получены книги из списка желаний' });
+    const wishlist = await User.findById(req.user.id).select('wishlist');
+
+    if (!wishlist) {
+        res.status(400);
+        throw new Error('Список желаемого пуст');
+    }
+    
+    const books = await Book.find({ _id: { $in: wishlist.wishlist } });
+    
+    res.status(200).json(books);
 });
 
 // @desc Remove book from user wishlist
 // @route DELETE /api/users/wishlist:id
 // @access Private
 const removeFromWishlist = asyncHandler(async (req, res) => {
-    res.json({ message: 'Книга удалена из списка желаний' });
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+        res.status(400);
+        throw new Error('Книга не найдена');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user.wishlist.includes(book._id)) {
+        res.status(400);
+        throw new Error('Книга не найдена в списке желаемого');
+    }
+
+    await user.wishlist.pull(book._id);
+    await user.save();
+
+    res.status(200).json({ message: `Книга ${book.title} удалена из списка желаний` });
 });
 
 // @desc Move book to readlist
 // @route PATCH /api/users/wishlist:id
 // @access Private
 const moveToReadlist = asyncHandler(async (req, res) => {
-    res.json({ message: 'Книга перемещена в список прочитанных' });
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+        res.status(400);
+        throw new Error('Книга не найдена');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user.wishlist.includes(book._id)) {
+        res.status(400);    
+        throw new Error('Книга не находится в списке желаемого');
+    }
+
+    user.wishlist.pull(book._id);
+    user.readlist.push(book._id);
+    await user.save();
+
+    res.status(200).json({ message: `Книга ${book.title} перемещена в список прочитанных` });
 });
 
 // @desc Get user readlist
 // @route GET /api/users/readlist
 // @access Private
 const getReadlist = asyncHandler(async (req, res) => {
-    res.json({ message: 'Получены книги из списка прочитанных' });
+    const readlist = await User.findById(req.user.id).select('readlist');
+
+    if (!readlist) {
+        res.status(404);
+        throw new Error('Список прочитанных пуст');
+    }
+    
+    const books = await Book.find({ _id: { $in: readlist.readlist } });
+    
+    res.status(200).json(books);
 });
 
 // @desc Remove book from user readlist
 // @route DELETE /api/users/readlist:id
 // @access Private
 const removeFromReadlist = asyncHandler(async (req, res) => {
-    res.json({ message: 'Книга удалена из списка прочитанных' });
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+        res.status(400);
+        throw new Error('Книга не найдена');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user.readlist.includes(book._id)) {
+        res.status(400);
+        throw new Error('Книга не найдена в списке прочитанных');
+    }
+
+    await user.readlist.pull(book._id);
+    await user.save();
+
+    res.status(200).json({ message: `Книга ${book.title} удалена из списка прочитанных` });
 });
 
 // @desc Move book to wishlist
-// @route GET /api/users/readlist:id
+// @route PATCH /api/users/readlist:id
 // @access Private
 const moveToWishlist = asyncHandler(async (req, res) => {
-    res.json({ message: 'Книга перемещена в список желаний' });
+    const book = await Book.findById(req.params.id);
+
+    if (!book) {
+        res.status(400);
+        throw new Error('Книга не найдена');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user.readlist.includes(book._id)) {
+        res.status(400);    
+        throw new Error('Книга не находится в списке прочитанных');
+    }
+
+    user.readlist.pull(book._id);
+    user.wishlist.push(book._id);
+    await user.save();
+
+    res.status(200).json({ message: `Книга ${book.title} перемещена в список желаний` });
 });
 
 // Generate JWT

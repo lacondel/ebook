@@ -99,7 +99,7 @@ const addBookToWishlist = asyncHandler(async (req, res) => {
 
     if (user.wishlist.includes(book._id)) {
         res.status(400);
-        throw new Error('Книга уже в списке желаний');
+        throw new Error('Книга уже в списке желаемого');
     }
 
     if (user.readlist.includes(book._id)) {
@@ -110,7 +110,7 @@ const addBookToWishlist = asyncHandler(async (req, res) => {
     user.wishlist.push(book._id);
     await user.save();
 
-    res.json({ message: 'Книга добавлена в ваш список желаний' });
+    res.json({ message: 'Книга добавлена в ваш список желаемого' });
 });
 
 // @desc Add book to user readlist
@@ -138,7 +138,7 @@ const addBookToReadlist = asyncHandler(async (req, res) => {
 
     if (user.wishlist.includes(book._id)) {
         res.status(400);
-        throw new Error('Книга находится в списке желаний');
+        throw new Error('Книга находится в списке желаемого');
     }
 
     user.readlist.push(book._id);
