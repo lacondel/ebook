@@ -29,14 +29,16 @@ const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role: 'user'
+        role: 'user',
     })
 
     if (user) {
         res.status(201).json({
             _id: user.id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            role: user.role,
+            token: generateToken(user._id)
         });
     } else {
         res.status(400);
