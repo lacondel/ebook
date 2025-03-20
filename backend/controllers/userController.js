@@ -71,27 +71,19 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route GET /api/users/me
 // @access Private
 const getMe = asyncHandler(async (req, res) => {
-    const { _id, name, email } = await User.findById(req.user.id);
-
-    res.status(200).json({
-        id: _id,
-        name,
-        email
-    });
+    res.status(200).json(req.user);
 });
 
 // @desc Get user wishlist
 // @route GET /api/users/wishlist
 // @access Private
 const getWishlist = asyncHandler(async (req, res) => {
-    const wishlist = await User.findById(req.user.id).select('wishlist');
-
-    if (!wishlist) {
+    if (!req.user.wishlist) {
         res.status(400);
         throw new Error('Список желаемого пуст');
     }
     
-    const books = await Book.find({ _id: { $in: wishlist.wishlist } });
+    const books = await Book.find({ _id: { $in: req.user.wishlist } });
     
     res.status(200).json(books);
 });
@@ -107,15 +99,13 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
         throw new Error('Книга не найдена');
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user.wishlist.includes(book._id)) {
+    if (!req.user.wishlist.includes(book._id)) {
         res.status(400);
         throw new Error('Книга не найдена в списке желаемого');
     }
 
-    await user.wishlist.pull(book._id);
-    await user.save();
+    req.user.wishlist.pull(book._id);
+    await req.user.save();
 
     res.status(200).json({ message: `Книга ${book.title} удалена из списка желаний` });
 });
@@ -131,16 +121,14 @@ const moveToReadlist = asyncHandler(async (req, res) => {
         throw new Error('Книга не найдена');
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user.wishlist.includes(book._id)) {
+    if (!req.user.wishlist.includes(book._id)) {
         res.status(400);    
         throw new Error('Книга не находится в списке желаемого');
     }
 
-    user.wishlist.pull(book._id);
-    user.readlist.push(book._id);
-    await user.save();
+    req.user.wishlist.pull(book._id);
+    req.user.readlist.push(book._id);
+    await req.user.save();
 
     res.status(200).json({ message: `Книга ${book.title} перемещена в список прочитанных` });
 });
@@ -149,14 +137,12 @@ const moveToReadlist = asyncHandler(async (req, res) => {
 // @route GET /api/users/readlist
 // @access Private
 const getReadlist = asyncHandler(async (req, res) => {
-    const readlist = await User.findById(req.user.id).select('readlist');
-
-    if (!readlist) {
+    if (!req.user.readlist) {
         res.status(404);
         throw new Error('Список прочитанных пуст');
     }
     
-    const books = await Book.find({ _id: { $in: readlist.readlist } });
+    const books = await Book.find({ _id: { $in: req.user.readlist } });
     
     res.status(200).json(books);
 });
@@ -172,15 +158,13 @@ const removeFromReadlist = asyncHandler(async (req, res) => {
         throw new Error('Книга не найдена');
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user.readlist.includes(book._id)) {
+    if (!req.user.readlist.includes(book._id)) {
         res.status(400);
         throw new Error('Книга не найдена в списке прочитанных');
     }
 
-    await user.readlist.pull(book._id);
-    await user.save();
+    req.user.readlist.pull(book._id);
+    await req.user.save();
 
     res.status(200).json({ message: `Книга ${book.title} удалена из списка прочитанных` });
 });
@@ -196,16 +180,14 @@ const moveToWishlist = asyncHandler(async (req, res) => {
         throw new Error('Книга не найдена');
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user.readlist.includes(book._id)) {
+    if (!req.user.readlist.includes(book._id)) {
         res.status(400);    
         throw new Error('Книга не находится в списке прочитанных');
     }
 
-    user.readlist.pull(book._id);
-    user.wishlist.push(book._id);
-    await user.save();
+    req.user.readlist.pull(book._id);
+    req.user.wishlist.push(book._id);
+    await req.user.save();
 
     res.status(200).json({ message: `Книга ${book.title} перемещена в список желаний` });
 });

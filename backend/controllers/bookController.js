@@ -90,25 +90,23 @@ const addBookToWishlist = asyncHandler(async (req, res) => {
         throw new Error('Книга не найдена');
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
+    if (!req.user) {
         res.status(400);
         throw new Error('Пользователь не найден');
     }
 
-    if (user.wishlist.includes(book._id)) {
+    if (req.user.wishlist.includes(book._id)) {
         res.status(400);
         throw new Error('Книга уже в списке желаемого');
     }
 
-    if (user.readlist.includes(book._id)) {
+    if (req.user.readlist.includes(book._id)) {
         res.status(400);
         throw new Error('Книга находится в списке прочитанных');
     }
 
-    user.wishlist.push(book._id);
-    await user.save();
+    req.user.wishlist.push(book._id);
+    await req.user.save();
 
     res.json({ message: 'Книга добавлена в ваш список желаемого' });
 });
@@ -124,25 +122,23 @@ const addBookToReadlist = asyncHandler(async (req, res) => {
         throw new Error('Книга не найдена');
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
+    if (!req.user) {
         res.status(400);
         throw new Error('Пользователь не найден');
     }
 
-    if (user.readlist.includes(book._id)) {
+    if (req.user.readlist.includes(book._id)) {
         res.status(400);
         throw new Error('Книга уже в списке прочитанных');
     }
 
-    if (user.wishlist.includes(book._id)) {
+    if (req.user.wishlist.includes(book._id)) {
         res.status(400);
         throw new Error('Книга находится в списке желаемого');
     }
 
-    user.readlist.push(book._id);
-    await user.save();
+    req.user.readlist.push(book._id);
+    await req.user.save();
 
     res.json({ message: 'Книга добавлена в ваш список прочитанных' });
 });
