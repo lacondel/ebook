@@ -8,9 +8,9 @@ function BookList() {
 
     return (
         <>
-        <section className="heading">
-            <p>Elige cuidadosamente lo que pones en ti</p>
-        </section>
+            <section className="heading">
+                <p>Elige cuidadosamente lo que pones en ti</p>
+            </section>
         </>
     )
 }
