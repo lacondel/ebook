@@ -25,11 +25,11 @@ const getBookById = asyncHandler(async (req, res) => {
     res.status(200).json(book);
 });
 
-// @desc Set book
+// @desc Add book
 // @route POST /api/books
 // @access Private
-const setBook = asyncHandler(async (req, res) => {
-    if (!req.body.title) {
+const addBook = asyncHandler(async (req, res) => {
+    if (!req.body.title || !req.body.author || !req.body.description || !req.body.coverImage || !req.body.genre) {
         res.status(400);
         throw new Error('Название книги обязательно');
     };
@@ -42,7 +42,7 @@ const setBook = asyncHandler(async (req, res) => {
         genre: req.body.genre,
     });
 
-    res.status(200).json(book);
+    res.status(201).json(book);
 });
 
 // @desc Update book
@@ -146,7 +146,7 @@ const addBookToReadlist = asyncHandler(async (req, res) => {
 module.exports = {
     getAllBooks,
     getBookById,
-    setBook,
+    addBook,
     updateBook,
     deleteBook,
     addBookToWishlist,
