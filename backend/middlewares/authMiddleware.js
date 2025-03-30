@@ -21,12 +21,12 @@ const protect = asyncHandler(async (req, res, next) => {
             next();
             return;
         } catch (error) {
-            let message = 'Невальный токен';
+            let message = 'Невалидный токен';
             if (error.name === 'TokenExpiredError') {
                 message = 'Токен истек';
             }
             if (error.name === 'JsonWebTokenError') {
-                message = 'Невальная подпись токена';
+                message = 'Невалидная подпись токена';
             }
 
             res.status(401).json({ message });
