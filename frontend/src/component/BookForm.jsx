@@ -27,7 +27,6 @@ function BookForm() {
         }
 
         if (isSuccess) {
-            reset()
             toast.success('Книга успешно добавлена')
         }
 

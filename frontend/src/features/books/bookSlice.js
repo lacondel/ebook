@@ -10,9 +10,10 @@ const initialState = {
 }
 
 // Add book
-export const addBook = createAsyncThunk('book/add', async (book, thunkAPI) => {
+export const addBook = createAsyncThunk('books/add', async (bookData, thunkAPI) => {
     try {
-        return await bookService.addBook(book)
+        const token = thunkAPI.getState().auth.user.token
+        return await bookService.addBook(bookData, token)
     } catch (error) {
         const message = (error.response && error.response.data && error.response.data.message) ||
         error.message || error.toString()
