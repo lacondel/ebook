@@ -103,14 +103,27 @@ function BookForm() {
                         onChange={onChange} />
                 </div>
                 <div className="form-group">
-                    <input
-                        type="text"
+                    <select
                         className='form-control'
-                        id='genre'
-                        name='genre'
+                        id="genre"
+                        name="genre"
                         value={genre}
-                        placeholder='Введите жанр книги'
-                        onChange={onChange} />
+                        onChange={onChange}
+                        required
+                    >
+                        <option value="">Выберите жанр</option>
+                        <option value="комедия">Комедия</option>
+                        <option value="драма">Драма</option>
+                        <option value="фантастика">Фантастика</option>
+                        <option value="ужасы">Ужасы</option>
+                        <option value="детектив">Детектив</option>
+                        <option value="приключения">Приключения</option>
+                        <option value="мистика">Мистика</option>
+                        <option value="фэнтези">Фэнтези</option>
+                        <option value="психология">Психология</option>
+                        <option value="история">История</option>
+                        <option value="трагедия">Трагедия</option>
+                    </select>
                 </div>
                 <div className="form-group">
                     <button type="submit" className='btn btn-block'>
