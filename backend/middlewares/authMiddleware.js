@@ -35,8 +35,10 @@ const protect = asyncHandler(async (req, res, next) => {
     }
 
     if (!token) {
-        res.status(401);
-        throw new Error('Пользователь не авторизован, отсутствует токен');
+        return res.status(401).json({
+            success: false,
+            error: 'Требуется авторизация. Токен отсутствует'
+        });
     }
 });
 

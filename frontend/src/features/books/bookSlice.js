@@ -12,12 +12,13 @@ const initialState = {
 // Add book
 export const addBook = createAsyncThunk('books/add', async (bookData, thunkAPI) => {
     try {
-        const token = thunkAPI.getState().auth.user.token
-        return await bookService.addBook(bookData, token)
+        const { auth } = thunkAPI.getState()
+        if (!auth.user?.token) {
+            throw new Error('Требуется авторизация')
+        }
+        return await bookService.addBook(bookData, auth.user.token)
     } catch (error) {
-        const message = (error.response && error.response.data && error.response.data.message) ||
-        error.message || error.toString()
-
+        const message = error.message || 'Неизвестная ошибка'
         return thunkAPI.rejectWithValue(message)
     }
 })

@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Book = require('../models/bookModel');
 const User = require('../models/userModel');
+const { validationResult } = require('express-validator');
 
 // @desc Get all books
 // @route GET /api/books
@@ -29,6 +30,12 @@ const getBookById = asyncHandler(async (req, res) => {
 // @route POST /api/books
 // @access Private
 const addBook = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(400);
+        throw new Error(errors.array().map(e => e.msg).join(', '));
+    }
+
     if (!req.body.title || !req.body.author || !req.body.description || !req.body.coverImage || !req.body.genre) {
         res.status(400);
         throw new Error('Название книги обязательно');

@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { addBook, reset } from '../features/books/bookSlice'
 import Spinner from './Spinner'
 
+
 function BookForm() {
     const [formData, setFormData] = useState({
         title: '',
@@ -24,15 +25,35 @@ function BookForm() {
     useEffect(() => {
         if (isError) {
             toast.error(message)
+            dispatch(reset())
         }
 
         if (isSuccess) {
             toast.success('Книга успешно добавлена')
+            setFormData({
+                title: '',
+                author: '',
+                description: '',
+                coverImage: '',
+                genre: '',
+            });
+            dispatch(reset())
         }
-
-        dispatch(reset())
-
     }, [isError, isSuccess, message, dispatch])
+
+    const [touchedFields, setTouchedFields] = useState({});
+
+    const handleBlur = (e) => {
+        setTouchedFields({
+            ...touchedFields,
+            [e.target.name]: true
+        });
+
+        // Дополнительная валидация при потере фокуса
+        if (e.target.name === 'description' && e.target.value.length < 10) {
+            toast.error('Описание должно быть не менее 10 символов', { autoClose: 2000 })
+        }
+    };
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -44,14 +65,23 @@ function BookForm() {
     const onSubmit = (e) => {
         e.preventDefault()
 
-        const bookData = {
-            title,
-            author,
-            description,
-            coverImage,
-            genre,
+        if (!title || !author || !description || !coverImage || !genre) {
+            toast.error('Заполните все обязательные поля')
+            return
         }
 
+        if (description.length < 10) {
+            toast.error('Описание должно быть не менее 10 символов')
+            return
+        }
+
+        const urlPattern = /^\/[\w/-]+\.(jpe?g|png|gif|webp|svg)$/i;
+        if (!urlPattern.test(coverImage)) {
+            toast.error('Введите корректный URL изображения')
+            return
+        }
+
+        const bookData = { title, author, description, coverImage, genre }
         dispatch(addBook(bookData))
     }
 
@@ -85,12 +115,19 @@ function BookForm() {
                 <div className="form-group">
                     <input
                         type="text"
-                        className='form-control'
+                        className={`form-control ${touchedFields.description && description.length < 10 ? 'is-invalid' : ''}`}
                         id='description'
                         name='description'
                         value={description}
                         placeholder='Введите описание книги'
-                        onChange={onChange} />
+                        onChange={onChange}
+                        onBlur={handleBlur}
+                    />
+                    {description.length < 10 && touchedFields.description && (
+                        <div className="invalid-feedback" style={{ color: 'red', fontSize: '0.8rem', textAlign: 'left' }}>
+                            Описание должно быть минимум 10 символов
+                        </div>
+                    )}
                 </div>
                 <div className="form-group">
                     <input
