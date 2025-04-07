@@ -42,5 +42,16 @@ const protect = asyncHandler(async (req, res, next) => {
     }
 });
 
+const adminProtect = asyncHandler(async (req, res, next) => {
+    if (req.user.role !== 'admin') {
+        res.status(403);
+        throw new Error('Доступ запрещён, недостаточно прав');
+    }
+    next();
+});
 
-module.exports = { protect };
+
+module.exports = {
+    protect,
+    adminProtect
+};

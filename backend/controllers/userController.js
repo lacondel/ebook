@@ -22,6 +22,11 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error(`Пользователь с почтой ${email} уже существует`);
     }
 
+    if (password.length < 6) {
+        res.status(400);
+        throw new Error('Пароль должен быть не менее 6 символов');
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -82,9 +87,9 @@ const getWishlist = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Список желаемого пуст');
     }
-    
+
     const books = await Book.find({ _id: { $in: req.user.wishlist } });
-    
+
     res.status(200).json(books);
 });
 
@@ -122,7 +127,7 @@ const moveToReadlist = asyncHandler(async (req, res) => {
     }
 
     if (!req.user.wishlist.includes(book._id)) {
-        res.status(400);    
+        res.status(400);
         throw new Error('Книга не находится в списке желаемого');
     }
 
@@ -141,9 +146,9 @@ const getReadlist = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error('Список прочитанных пуст');
     }
-    
+
     const books = await Book.find({ _id: { $in: req.user.readlist } });
-    
+
     res.status(200).json(books);
 });
 
@@ -181,7 +186,7 @@ const moveToWishlist = asyncHandler(async (req, res) => {
     }
 
     if (!req.user.readlist.includes(book._id)) {
-        res.status(400);    
+        res.status(400);
         throw new Error('Книга не находится в списке прочитанных');
     }
 

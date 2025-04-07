@@ -16,7 +16,9 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Введите, пожалуйста, пароль']
+        required: [true, 'Введите, пожалуйста, пароль'],
+        minlength: [6, 'Пароль должен быть не менее 6 символов'],
+        select: false
     },
     role: {
         type: String,
@@ -32,8 +34,8 @@ const userSchema = mongoose.Schema({
         ref: 'Book'
     }]
 },
-{
-    timestamps: true
-});
+    {
+        timestamps: true
+    });
 
 module.exports = mongoose.model('User', userSchema);

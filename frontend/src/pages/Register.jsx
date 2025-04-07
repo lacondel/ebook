@@ -13,6 +13,7 @@ function Register() {
         password: '',
         repeatedPassword: ''
     })
+    const [errors, setErrors] = useState({});
 
     const { name, email, password, repeatedPassword } = formData
 
@@ -31,7 +32,7 @@ function Register() {
         }
 
         dispatch(reset())
-        
+
     }, [user, isError, isSuccess, message, navigate, dispatch])
 
     const onChange = (e) => {
@@ -42,20 +43,34 @@ function Register() {
     }
 
     const onSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        if (password !== repeatedPassword) {
-            toast.error('Пароли не совпадают')
-        } else {
-            const userData = {
-                name,
-                email,
-                password,
-            }
-
-            dispatch(register(userData))
+        if (!validateForm()) {
+            toast.error('Исправьте ошибки в форме');
+            return;
         }
-    }
+
+        const userData = {
+            name,
+            email,
+            password,
+        };
+
+        dispatch(register(userData));
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!name) newErrors.name = 'Имя обязательно';
+        if (!emailRegex.test(email)) newErrors.email = 'Некорректный email';
+        if (password.length < 6) newErrors.password = 'Минимум 6 символов';
+        if (password !== repeatedPassword) newErrors.repeatedPassword = 'Пароли не совпадают';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     if (isLoading) {
         return <Spinner />
@@ -82,6 +97,7 @@ function Register() {
                             placeholder="Введите ваше имя"
                             onChange={onChange}
                         />
+                        {errors.name && <div className="error">{errors.name}</div>}
                     </div>
                     <div className="form-group">
                         <input
@@ -93,6 +109,7 @@ function Register() {
                             placeholder="Введите ваш email"
                             onChange={onChange}
                         />
+                        {errors.email && <div className="error">{errors.email}</div>}
                     </div>
                     <div className="form-group">
                         <input
@@ -104,6 +121,7 @@ function Register() {
                             placeholder="Введите пароль"
                             onChange={onChange}
                         />
+                        {errors.password && <div className="error">{errors.password}</div>}
                     </div>
                     <div className="form-group">
                         <input
@@ -115,6 +133,7 @@ function Register() {
                             placeholder="Подтвердите пароль"
                             onChange={onChange}
                         />
+                        {errors.repeatedPassword && <div className="error">{errors.repeatedPassword}</div>}
                     </div>
                     <div className="form-group">
                         <button type='submit' className='btn btn-block'>
