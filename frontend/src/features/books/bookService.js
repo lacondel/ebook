@@ -25,8 +25,28 @@ const addBook = async (bookData, token) => {
     }
 }
 
+
+// Get books
+const getBooks = async () => {
+    try {
+        const response = await axios.get(API_URL)
+        return response.data
+    } catch (error) {
+        let errorMessage;
+        if (error.response) {
+            errorMessage = error.response.data.error || error.response.data.message
+        } else if (error.request) {
+            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+        } else {
+            errorMessage = error.message
+        }
+        throw new Error(errorMessage)
+    }
+}
+
 const bookService = {
-    addBook
+    addBook,
+    getBooks
 }
 
 export default bookService
