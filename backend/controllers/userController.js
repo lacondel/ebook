@@ -57,9 +57,18 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    // Явно запрашиваем поле password
+    const user = await User.findOne({ email }).select('+password');
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (!user) {
+        res.status(400);
+        throw new Error('Пользователь не найден');
+    }
+
+    // Теперь user.password гарантированно существует
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
         res.json({
             _id: user.id,
             name: user.name,
@@ -68,7 +77,7 @@ const loginUser = asyncHandler(async (req, res) => {
         });
     } else {
         res.status(400);
-        throw new Error('Ошибка учётных данных');
+        throw new Error('Неверный пароль');
     }
 });
 

@@ -87,8 +87,6 @@ h3 {
 }
 
 .books {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
 
@@ -99,7 +97,7 @@ h3 {
   position: relative;
 }
 
-.book .close {
+.book .delete-btn {
   position: absolute;
   top: 10px;
   right: 15px;
