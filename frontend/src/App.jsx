@@ -8,6 +8,7 @@ import Register from './pages/Register'
 import Header from './component/Header'
 import EditBookForm from './component/EditBookForm'
 import BookForm from './component/BookForm'
+import BookDetails from './component/BookDetails'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path='/register' element={<Register />} />
             <Route path='/edit-book/:id' element={<EditBookForm />} />
             <Route path='/book-form' element={<BookForm />} />
+            <Route path='/books/:id' element={<BookDetails />} />
           </Routes>
         </div>
       </Router>
