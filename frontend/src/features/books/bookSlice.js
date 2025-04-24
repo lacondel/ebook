@@ -3,6 +3,7 @@ import bookService from './bookService'
 
 const initialState = {
     books: [],
+    book: null,
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -33,6 +34,44 @@ export const getBooks = createAsyncThunk('books/getAll', async (_, thunkAPI) => 
     }
 })
 
+// Get book by id
+export const getBookById = createAsyncThunk('books/getById', async (id, thunkAPI) => {
+    try {
+        return await bookService.getBookById(id)
+    } catch (error) {
+        const message = error.message || 'Неизвестная ошибка'
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// Update book
+export const updateBook = createAsyncThunk('books/update', async ({ id, bookData }, thunkAPI) => {
+    try {
+        const { auth } = thunkAPI.getState()
+        if (!auth.user?.token) {
+            throw new Error('Требуется авторизация')
+        }
+        return await bookService.updateBook(id, bookData, auth.user.token)
+    } catch (error) {
+        const message = error.message || 'Неизвестная ошибка'
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// Delete book
+export const deleteBook = createAsyncThunk('books/delete', async (id, thunkAPI) => {
+    try {
+        const { auth } = thunkAPI.getState()
+        if (!auth.user?.token) {
+            throw new Error('Требуется авторизация')
+        }
+        return await bookService.deleteBook(id, auth.user.token)
+    } catch (error) {
+        const message = error.message || 'Неизвестная ошибка'
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
 export const bookSlice = createSlice({
     name: 'book',
     initialState,
@@ -42,6 +81,7 @@ export const bookSlice = createSlice({
             state.isError = false
             state.isSuccess = false
             state.message = ''
+            state.book = null
         }
     },
     extraReducers: (builder) => {
@@ -72,8 +112,50 @@ export const bookSlice = createSlice({
                 state.isError = true
                 state.message = action.payload
             })
+            .addCase(getBookById.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(getBookById.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.book = action.payload
+            })
+            .addCase(getBookById.rejected, (state, action) => {
+                state.isLoading = false
+                state.isError = true
+                state.message = action.payload
+            })
+            .addCase(updateBook.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(updateBook.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.book = action.payload
+                const index = state.books.findIndex(book => book._id === action.payload._id)
+                if (index !== -1) {
+                    state.books[index] = action.payload
+                }
+            })
+            .addCase(updateBook.rejected, (state, action) => {
+                state.isLoading = false
+                state.isError = true
+                state.message = action.payload
+            })
+            .addCase(deleteBook.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(deleteBook.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.books = state.books.filter(book => book._id !== action.payload.id)
+            })
+            .addCase(deleteBook.rejected, (state, action) => {
+                state.isLoading = false
+                state.isError = true
+                state.message = action.payload
+            })
     }
-
 })
 
 export const { reset } = bookSlice.actions

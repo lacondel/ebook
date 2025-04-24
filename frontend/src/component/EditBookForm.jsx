@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { addBook, reset } from '../features/books/bookSlice'
-import { importantToastConfig, quickToastConfig } from '../utils/toastConfig'
+import { getBookById, updateBook, reset } from '../features/books/bookSlice'
 import Spinner from './Spinner'
 
+const toastConfig = {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+}
 
-function BookForm() {
+function EditBookForm() {
     const [formData, setFormData] = useState({
         title: '',
         author: '',
@@ -15,44 +22,75 @@ function BookForm() {
         coverImage: '',
         genre: '',
     })
-    const [isSubmitted, setIsSubmitted] = useState(false)
+    const [isEdited, setIsEdited] = useState(false)
 
     const { title, author, description, coverImage, genre } = formData
-
+    const { id } = useParams()
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const { isLoading, isError, isSuccess, message } = useSelector((state) => state.books)
+    const { book, isLoading, isError, isSuccess, message } = useSelector((state) => state.books)
+    const { user } = useSelector((state) => state.auth)
 
     useEffect(() => {
-        if (isError) {
-            toast.error(message, importantToastConfig)
-            dispatch(reset())
-            setIsSubmitted(false)
+        if (!user || user.role !== 'admin') {
+            toast.error('У вас нет прав для редактирования книг', toastConfig)
+            navigate('/')
+            return
         }
 
-        if (isSuccess && isSubmitted) {
-            toast.success('Книга успешно добавлена', quickToastConfig)
-            navigate('/')
-        }
+        dispatch(getBookById(id))
 
         return () => {
             dispatch(reset())
         }
-    }, [isError, isSuccess, message, dispatch, navigate])
+    }, [dispatch, id, navigate, user])
 
-    const [touchedFields, setTouchedFields] = useState({});
+    useEffect(() => {
+        if (isError) {
+            toast.error(message, toastConfig)
+            dispatch(reset())
+        }
+
+        if (isSuccess && isEdited) {
+            toast.success('Книга успешно обновлена', {
+                ...toastConfig,
+                autoClose: 2000,
+                onClose: () => {
+                    navigate('/')
+                    dispatch(reset())
+                }
+            })
+        }
+    }, [isError, isSuccess, message, dispatch, navigate, isEdited])
+
+    useEffect(() => {
+        if (book) {
+            setFormData({
+                title: book.title || '',
+                author: book.author || '',
+                description: book.description || '',
+                coverImage: book.coverImage || '',
+                genre: book.genre || '',
+            })
+        }
+    }, [book])
+
+    const [touchedFields, setTouchedFields] = useState({})
 
     const handleBlur = (e) => {
         setTouchedFields({
             ...touchedFields,
             [e.target.name]: true
-        });
+        })
 
         if (e.target.name === 'description' && e.target.value.length < 10) {
-            toast.warning('Описание должно быть не менее 10 символов', quickToastConfig)
+            toast.warning('Описание должно быть не менее 10 символов', {
+                ...toastConfig,
+                autoClose: 2000
+            })
         }
-    };
+    }
 
     const onChange = (e) => {
         setFormData((prevState) => ({
@@ -65,24 +103,24 @@ function BookForm() {
         e.preventDefault()
 
         if (!title || !author || !description || !coverImage || !genre) {
-            toast.error('Заполните все обязательные поля', importantToastConfig)
+            toast.error('Заполните все обязательные поля', toastConfig)
             return
         }
 
         if (description.length < 10) {
-            toast.error('Описание должно быть не менее 10 символов', importantToastConfig)
+            toast.error('Описание должно быть не менее 10 символов', toastConfig)
             return
         }
 
-        const urlPattern = /^\/[\w/-]+\.(jpe?g|png|gif|webp|svg)$/i;
+        const urlPattern = /^\/[\w/-]+\.(jpe?g|png|gif|webp|svg)$/i
         if (!urlPattern.test(coverImage)) {
-            toast.error('Введите корректный URL изображения', importantToastConfig)
+            toast.error('Введите корректный URL изображения', toastConfig)
             return
         }
 
+        setIsEdited(true)
         const bookData = { title, author, description, coverImage, genre }
-        setIsSubmitted(true)
-        dispatch(addBook(bookData))
+        dispatch(updateBook({ id, bookData }))
     }
 
     if (isLoading) {
@@ -100,7 +138,8 @@ function BookForm() {
                         name='title'
                         value={title}
                         placeholder='Введите название книги'
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                 </div>
                 <div className="form-group">
                     <input
@@ -110,7 +149,8 @@ function BookForm() {
                         name='author'
                         value={author}
                         placeholder='Введите ФИО автора книги'
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                 </div>
                 <div className="form-group">
                     <input
@@ -137,7 +177,8 @@ function BookForm() {
                         name='coverImage'
                         value={coverImage}
                         placeholder='Введите путь до изображения обложки'
-                        onChange={onChange} />
+                        onChange={onChange}
+                    />
                 </div>
                 <div className="form-group">
                     <select
@@ -164,7 +205,7 @@ function BookForm() {
                 </div>
                 <div className="form-group">
                     <button type="submit" className='btn btn-block'>
-                        Добавить книгу
+                        Обновить книгу
                     </button>
                 </div>
                 <div className="form-group">
@@ -177,4 +218,4 @@ function BookForm() {
     )
 }
 
-export default BookForm
+export default EditBookForm 

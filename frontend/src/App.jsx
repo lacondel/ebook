@@ -6,7 +6,8 @@ import BookList from './pages/BookList'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Header from './component/Header'
-import AdminPage from './pages/AdminPage'
+import EditBookForm from './component/EditBookForm'
+import BookForm from './component/BookForm'
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
             <Route path='/' element={<BookList />} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
-            <Route path='/admin' element={<AdminPage />} />
+            <Route path='/edit-book/:id' element={<EditBookForm />} />
+            <Route path='/book-form' element={<BookForm />} />
           </Routes>
         </div>
       </Router>

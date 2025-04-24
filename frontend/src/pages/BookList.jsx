@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { getBooks, reset } from '../features/books/bookSlice'
 import Spinner from '../component/Spinner'
 import BookItem from '../component/BookItem'
+import AddBookButton from '../component/AddBookButton'
 import { toast } from 'react-toastify'
 
 function BookList() {
-    const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const { user } = useSelector((state) => state.auth)
@@ -23,7 +22,7 @@ function BookList() {
         return () => {
             dispatch(reset())
         }
-    }, [])
+    }, [dispatch, isError, message])
 
     if (isLoading) {
         return <Spinner />
@@ -34,6 +33,9 @@ function BookList() {
             <section className="heading">
                 <p>Elige cuidadosamente lo que pones en ti</p>
             </section>
+
+            <AddBookButton />
+
             <section className='content'>
                 {books.length > 0 ? (
                     <div className="books">
@@ -42,7 +44,9 @@ function BookList() {
                         ))}
                     </div>
                 ) : (
-                    <h3>База книг пуста</h3>
+                    user?.role === 'admin' ? 
+                    <h3>Список книг пуст. Добавьте первую книгу!</h3> : 
+                    <h3>База книг пуста</h3> 
                 )}
             </section>
         </>

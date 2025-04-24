@@ -53,19 +53,53 @@ const addBook = asyncHandler(async (req, res) => {
 });
 
 // @desc Update book
-// @route PUT /api/books:id
+// @route PUT /api/books/:id
 // @access Private
 const updateBook = asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(400);
+        throw new Error(errors.array().map(e => e.msg).join(', '));
+    }
+
     const book = await Book.findById(req.params.id);
 
     if (!book) {
-        res.status(400);
+        res.status(404);
         throw new Error('Книга не найдена');
     }
 
-    const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-    });
+    const { title, author, description, coverImage, genre } = req.body;
+    
+    if (!title || !author || !description || !coverImage || !genre) {
+        res.status(400);
+        throw new Error('Все поля обязательны для заполнения');
+    }
+
+    if (description.length < 10 || description.length > 500) {
+        res.status(400);
+        throw new Error('Описание должно быть от 10 до 500 символов');
+    }
+
+    if (!Book.schema.path('genre').enumValues.includes(genre)) {
+        res.status(400);
+        throw new Error('Указан неверный жанр');
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+        req.params.id,
+        {
+            title,
+            author,
+            description,
+            coverImage,
+            genre
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    );
 
     res.status(200).json(updatedBook);
 });

@@ -43,7 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            token: generateToken(user._id)
+            token: generateToken(user._id, user.role)
         });
     } else {
         res.status(400);
@@ -57,7 +57,6 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    // Явно запрашиваем поле password
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
@@ -65,7 +64,6 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new Error('Пользователь не найден');
     }
 
-    // Теперь user.password гарантированно существует
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
@@ -73,7 +71,8 @@ const loginUser = asyncHandler(async (req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
-            token: generateToken(user._id)
+            role: user.role,
+            token: generateToken(user._id, user.role)
         });
     } else {
         res.status(400);

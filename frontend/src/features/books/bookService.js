@@ -25,7 +25,6 @@ const addBook = async (bookData, token) => {
     }
 }
 
-
 // Get books
 const getBooks = async () => {
     try {
@@ -44,9 +43,74 @@ const getBooks = async () => {
     }
 }
 
+// Get book by id
+const getBookById = async (id) => {
+    try {
+        const response = await axios.get(API_URL + id)
+        return response.data
+    } catch (error) {
+        let errorMessage;
+        if (error.response) {
+            errorMessage = error.response.data.error || error.response.data.message
+        } else if (error.request) {
+            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+        } else {
+            errorMessage = error.message
+        }
+        throw new Error(errorMessage)
+    }
+}
+
+// Update book
+const updateBook = async (id, bookData, token) => {
+    try {
+        const config = {
+            headers: { Authorization: `Bearer ${token}` }
+        }
+
+        const response = await axios.put(API_URL + id, bookData, config)
+        return response.data
+    } catch (error) {
+        let errorMessage;
+        if (error.response) {
+            errorMessage = error.response.data.error || error.response.data.message
+        } else if (error.request) {
+            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+        } else {
+            errorMessage = error.message
+        }
+        throw new Error(errorMessage)
+    }
+}
+
+// Delete book
+const deleteBook = async (id, token) => {
+    try {
+        const config = {
+            headers: { Authorization: `Bearer ${token}` }
+        }
+
+        const response = await axios.delete(API_URL + id, config)
+        return response.data
+    } catch (error) {
+        let errorMessage;
+        if (error.response) {
+            errorMessage = error.response.data.error || error.response.data.message
+        } else if (error.request) {
+            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+        } else {
+            errorMessage = error.message
+        }
+        throw new Error(errorMessage)
+    }
+}
+
 const bookService = {
     addBook,
-    getBooks
+    getBooks,
+    getBookById,
+    updateBook,
+    deleteBook
 }
 
 export default bookService
