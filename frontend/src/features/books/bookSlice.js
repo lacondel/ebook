@@ -7,7 +7,10 @@ const initialState = {
     isError: false,
     isSuccess: false,
     isLoading: false,
-    message: ''
+    message: '',
+    search: '',
+    genre: '',
+    sort: ''
 }
 
 // Add book
@@ -25,11 +28,16 @@ export const addBook = createAsyncThunk('books/add', async (bookData, thunkAPI) 
 })
 
 // Get books
-export const getBooks = createAsyncThunk('books/getAll', async (_, thunkAPI) => {
+export const getBooks = createAsyncThunk('books/getAll', async ({ search, genre, sort }, thunkAPI) => {
     try {
-        return await bookService.getBooks()
+        return await bookService.getBooks({ search, genre, sort })
     } catch (error) {
-        const message = error.message || 'Неизвестная ошибка'
+        const message =
+            (error.response &&
+                error.response.data &&
+                error.response.data.message) ||
+            error.message ||
+            error.toString()
         return thunkAPI.rejectWithValue(message)
     }
 })
@@ -73,15 +81,18 @@ export const deleteBook = createAsyncThunk('books/delete', async (id, thunkAPI) 
 })
 
 export const bookSlice = createSlice({
-    name: 'book',
+    name: 'books',
     initialState,
     reducers: {
-        reset: (state) => {
-            state.isLoading = false
-            state.isError = false
-            state.isSuccess = false
-            state.message = ''
-            state.book = null
+        reset: (state) => initialState,
+        setSearch: (state, action) => {
+            state.search = action.payload
+        },
+        setGenre: (state, action) => {
+            state.genre = action.payload
+        },
+        setSort: (state, action) => {
+            state.sort = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -104,7 +115,7 @@ export const bookSlice = createSlice({
             })
             .addCase(getBooks.fulfilled, (state, action) => {
                 state.isLoading = false
-                state.isSuccess = true
+                state.isError = false
                 state.books = action.payload
             })
             .addCase(getBooks.rejected, (state, action) => {
@@ -158,5 +169,5 @@ export const bookSlice = createSlice({
     }
 })
 
-export const { reset } = bookSlice.actions
+export const { reset, setSearch, setGenre, setSort } = bookSlice.actions
 export default bookSlice.reducer

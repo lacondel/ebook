@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getAllBooks,
+  getBooks,
   getBookById,
   addBook,
   updateBook,
@@ -15,7 +15,7 @@ const { body } = require("express-validator");
 
 router
   .route("/")
-  .get(getAllBooks)
+  .get(getBooks)
   .post(
     protect,
     [

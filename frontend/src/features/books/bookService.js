@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = '/api/books/'
+const API_URL = '/api/books'
 
 // Add book
 const addBook = async (bookData, token) => {
@@ -26,10 +26,15 @@ const addBook = async (bookData, token) => {
 }
 
 // Get books
-const getBooks = async () => {
+const getBooks = async ({ search, genre, sort }) => {
     try {
-        const response = await axios.get(API_URL)
-        return response.data
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (genre) params.append('genre', genre);
+        if (sort) params.append('sort', sort);
+
+        const response = await axios.get(`${API_URL}?${params.toString()}`);
+        return response.data;
     } catch (error) {
         let errorMessage;
         if (error.response) {
@@ -46,7 +51,7 @@ const getBooks = async () => {
 // Get book by id
 const getBookById = async (id) => {
     try {
-        const response = await axios.get(API_URL + id)
+        const response = await axios.get(`${API_URL}/${id}`);
         return response.data
     } catch (error) {
         let errorMessage;
@@ -68,7 +73,7 @@ const updateBook = async (id, bookData, token) => {
             headers: { Authorization: `Bearer ${token}` }
         }
 
-        const response = await axios.put(API_URL + id, bookData, config)
+        const response = await axios.put(`${API_URL}/${id}`, bookData, config)
         return response.data
     } catch (error) {
         let errorMessage;
@@ -90,7 +95,7 @@ const deleteBook = async (id, token) => {
             headers: { Authorization: `Bearer ${token}` }
         }
 
-        const response = await axios.delete(API_URL + id, config)
+        const response = await axios.delete(`${API_URL}/${id}`, config)
         return response.data
     } catch (error) {
         let errorMessage;

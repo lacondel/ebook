@@ -1,55 +1,43 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { getBooks, reset } from '../features/books/bookSlice'
-import Spinner from '../component/Spinner'
-import BookItem from '../component/BookItem'
+import { getBooks } from '../features/books/bookSlice'
+import BookListContent from '../component/BookListContent'
+import BookFilters from '../component/BookFilters'
 import AddBookButton from '../component/AddBookButton'
-import { toast } from 'react-toastify'
+import '../styles/BookList.css'
 
-function BookList() {
+const BookList = () => {
     const dispatch = useDispatch()
+    const [isInitialLoad, setIsInitialLoad] = useState(true)
 
     const { user } = useSelector((state) => state.auth)
-    const { books, isLoading, isError, message } = useSelector((state) => state.books)
+    const { books, isLoading, search, genre, sort } = useSelector((state) => state.books)
+
+    const fetchBooks = useCallback(async () => {
+        try {
+            await dispatch(getBooks({ search, genre, sort })).unwrap()
+            setIsInitialLoad(false)
+        } catch (error) {
+            console.error(error)
+        }
+    }, [dispatch, search, genre, sort])
 
     useEffect(() => {
-        if (isError) {
-            toast.error(message)
-        }
-
-        dispatch(getBooks())
-
-        return () => {
-            dispatch(reset())
-        }
-    }, [dispatch, isError, message])
-
-    if (isLoading) {
-        return <Spinner />
-    }
+        fetchBooks()
+    }, [fetchBooks])
 
     return (
-        <>
-            <section className="heading">
-                <p>Elige cuidadosamente lo que pones en ti</p>
+        <div className="book-list-page">
+            <section className="content">
+                <BookFilters />
+                {user?.role === 'admin' && <AddBookButton />}
+                <BookListContent 
+                    books={books} 
+                    isLoading={isLoading && isInitialLoad} 
+                    user={user} 
+                />
             </section>
-
-            <AddBookButton />
-
-            <section className='content'>
-                {books.length > 0 ? (
-                    <div className="books">
-                        {books.map((book) => (
-                            <BookItem key={book._id} book={book} />
-                        ))}
-                    </div>
-                ) : (
-                    user?.role === 'admin' ? 
-                    <h3>Список книг пуст. Добавьте первую книгу!</h3> : 
-                    <h3>База книг пуста</h3> 
-                )}
-            </section>
-        </>
+        </div>
     )
 }
 

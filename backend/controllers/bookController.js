@@ -3,13 +3,36 @@ const Book = require('../models/bookModel');
 const User = require('../models/userModel');
 const { validationResult } = require('express-validator');
 
-// @desc Get all books
-// @route GET /api/books
-// @access Public
-const getAllBooks = asyncHandler(async (req, res) => {
-    const books = await Book.find();
+// @desc    Get all books with filters
+// @route   GET /api/books
+// @access  Public
+const getBooks = asyncHandler(async (req, res) => {
+    const { search, genre, sort } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    if (search) {
+        filter.title = { $regex: search, $options: 'i' };
+    }
+    if (genre && genre !== '') {
+        filter.genre = genre;
+    }
 
-    res.status(200).json(books);
+    // Build sort object
+    const sortOptions = {};
+    if (sort === 'asc') {
+        sortOptions.title = 1;
+    } else if (sort === 'desc') {
+        sortOptions.title = -1;
+    }
+
+    try {
+        const books = await Book.find(filter).sort(sortOptions);
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500);
+        throw new Error('Ошибка при получении списка книг');
+    }
 });
 
 // @desc Get book by id
@@ -185,7 +208,7 @@ const addBookToReadlist = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-    getAllBooks,
+    getBooks,
     getBookById,
     addBook,
     updateBook,
