@@ -74,13 +74,19 @@ function BookForm() {
             return
         }
 
-        const urlPattern = /^\/[\w/-]+\.(jpe?g|png|gif|webp|svg)$/i;
-        if (!urlPattern.test(coverImage)) {
-            toast.error('Введите корректный URL изображения', importantToastConfig)
+        const imagePattern = /^[\w-]+\.(jpe?g|png|gif|webp|svg)$/i;
+        if (!imagePattern.test(coverImage)) {
+            toast.error('Введите корректное название файла изображения (например: book.jpg)', importantToastConfig)
             return
         }
 
-        const bookData = { title, author, description, coverImage, genre }
+        const bookData = { 
+            title, 
+            author, 
+            description, 
+            coverImage: `/covers/${coverImage}`, 
+            genre 
+        }
         setIsSubmitted(true)
         dispatch(addBook(bookData))
     }
@@ -113,8 +119,7 @@ function BookForm() {
                         onChange={onChange} />
                 </div>
                 <div className="form-group">
-                    <input
-                        type="text"
+                    <textarea
                         className={`form-control ${touchedFields.description && description.length < 10 ? 'is-invalid' : ''}`}
                         id='description'
                         name='description'
@@ -122,7 +127,12 @@ function BookForm() {
                         placeholder='Введите описание книги'
                         onChange={onChange}
                         onBlur={handleBlur}
+                        rows={6}
+                        maxLength={5000}
                     />
+                    <div className="character-count">
+                        {description.length} / 5000 символов
+                    </div>
                     {description.length < 10 && touchedFields.description && (
                         <div className="invalid-feedback" style={{ color: 'red', fontSize: '0.8rem', textAlign: 'left' }}>
                             Описание должно быть минимум 10 символов
@@ -136,7 +146,7 @@ function BookForm() {
                         id='coverImage'
                         name='coverImage'
                         value={coverImage}
-                        placeholder='Введите путь до изображения обложки'
+                        placeholder='Введите название файла изображения (например: book.jpg)'
                         onChange={onChange} />
                 </div>
                 <div className="form-group">
@@ -160,6 +170,50 @@ function BookForm() {
                         <option value="психология">Психология</option>
                         <option value="история">История</option>
                         <option value="трагедия">Трагедия</option>
+                        <option value="роман">Роман</option>
+                        <option value="роман-эпопея">Роман-эпопея</option>
+                        <option value="повесть">Повесть</option>
+                        <option value="рассказ">Рассказ</option>
+                        <option value="триллер">Триллер</option>
+                        <option value="научная литература">Научная литература</option>
+                        <option value="биография">Биография</option>
+                        <option value="поэзия">Поэзия</option>
+                        <option value="лирическое стихотворение">Лирическое стихотворение</option>
+                        <option value="элегия">Элегия</option>
+                        <option value="послание">Послание</option>
+                        <option value="эпиграмма">Эпиграмма</option>
+                        <option value="ода">Ода</option>
+                        <option value="сонет">Сонет</option>
+                        <option value="поэма">Поэма</option>
+                        <option value="баллада">Баллада</option>
+                        <option value="сказка">Сказка</option>
+                        <option value="публицистика">Публицистика</option>
+                        <option value="художественная литература">Художественная литература</option>
+                        <option value="литература">Литература</option>
+                        <option value="классика">Классика</option>
+                        <option value="современная проза">Современная проза</option>
+                        <option value="антиутопия">Антиутопия</option>
+                        <option value="боевик">Боевик</option>
+                        <option value="военная проза">Военная проза</option>
+                        <option value="детская литература">Детская литература</option>
+                        <option value="исторический роман">Исторический роман</option>
+                        <option value="криминальный роман">Криминальный роман</option>
+                        <option value="любовный роман">Любовный роман</option>
+                        <option value="мемуары">Мемуары</option>
+                        <option value="научная фантастика">Научная фантастика</option>
+                        <option value="политический роман">Политический роман</option>
+                        <option value="притча">Притча</option>
+                        <option value="реализм">Реализм</option>
+                        <option value="сатира">Сатира</option>
+                        <option value="сентиментальный роман">Сентиментальный роман</option>
+                        <option value="социальная проза">Социальная проза</option>
+                        <option value="философская проза">Философская проза</option>
+                        <option value="философия">Философия</option>
+                        <option value="эпистолярный роман">Эпистолярный роман</option>
+                        <option value="эссе">Эссе</option>
+                        <option value="научно-популярная литература">Научно-популярная литература</option>
+                        <option value="философская сказка">Философская сказка</option>
+                        <option value="программирование">Программирование</option>
                     </select>
                 </div>
                 <div className="form-group">

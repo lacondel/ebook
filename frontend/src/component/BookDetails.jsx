@@ -36,7 +36,7 @@ function BookDetails() {
             <div className="book-details-content">
                 <div className="book-details-image">
                     <img
-                        src={`/covers${book.coverImage}`}
+                        src={book.coverImage}
                         alt={book.title}
                         className="book-cover-large"
                     />

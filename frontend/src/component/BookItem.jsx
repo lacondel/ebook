@@ -37,7 +37,7 @@ function BookItem({ book }) {
                 <Link to={`/books/${book._id}`} className="book-content">
                     <div className="book-cover-container">
                         <img
-                            src={`/covers${book.coverImage}`}
+                            src={book.coverImage}
                             alt={book.title}
                             className="book-cover"
                         />

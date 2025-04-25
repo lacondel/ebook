@@ -655,3 +655,15 @@ a:hover {
         width: 200px;
     }
 }
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.character-count {
+    text-align: right;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}

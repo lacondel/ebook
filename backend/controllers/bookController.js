@@ -76,9 +76,9 @@ const updateBook = asyncHandler(async (req, res) => {
         throw new Error('Все поля обязательны для заполнения');
     }
 
-    if (description.length < 10 || description.length > 500) {
+    if (description.length < 10 || description.length > 5000) {
         res.status(400);
-        throw new Error('Описание должно быть от 10 до 500 символов');
+        throw new Error('Описание должно быть от 10 до 5000 символов');
     }
 
     if (!Book.schema.path('genre').enumValues.includes(genre)) {
