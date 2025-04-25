@@ -6,8 +6,6 @@ const {
   addBook,
   updateBook,
   deleteBook,
-  addBookToWishlist,
-  addBookToReadlist,
 } = require("../controllers/bookController");
 const { protect, adminProtect } = require("../middlewares/authMiddleware");
 const Book = require("../models/bookModel");
@@ -47,8 +45,5 @@ router
     updateBook
   )
   .delete(protect, adminProtect, deleteBook);
-
-router.post("/wishlist/:id", protect, addBookToWishlist);
-router.post("/readlist/:id", protect, addBookToReadlist);
 
 module.exports = router;

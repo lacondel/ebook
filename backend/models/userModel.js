@@ -24,15 +24,7 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ['admin', 'user'],
         required: true
-    },
-    wishlist: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book'
-    }],
-    readlist: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book'
-    }]
+    }
 },
     {
         timestamps: true

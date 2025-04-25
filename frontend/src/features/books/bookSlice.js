@@ -159,7 +159,7 @@ export const bookSlice = createSlice({
             .addCase(deleteBook.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
-                state.books = state.books.filter(book => book._id !== action.payload.id)
+                state.books = state.books.filter(book => book._id !== action.payload)
             })
             .addCase(deleteBook.rejected, (state, action) => {
                 state.isLoading = false
