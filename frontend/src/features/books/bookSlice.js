@@ -84,7 +84,7 @@ export const bookSlice = createSlice({
     name: 'books',
     initialState,
     reducers: {
-        reset: (state) => initialState,
+        reset: () => initialState,
         setSearch: (state, action) => {
             state.search = action.payload
         },
@@ -103,6 +103,7 @@ export const bookSlice = createSlice({
             .addCase(addBook.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
+                state.isError = false
                 state.books.push(action.payload)
             })
             .addCase(addBook.rejected, (state, action) => {
@@ -116,6 +117,7 @@ export const bookSlice = createSlice({
             .addCase(getBooks.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isError = false
+                state.isSuccess = true
                 state.books = action.payload
             })
             .addCase(getBooks.rejected, (state, action) => {
@@ -129,6 +131,7 @@ export const bookSlice = createSlice({
             .addCase(getBookById.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
+                state.isError = false
                 state.book = action.payload
             })
             .addCase(getBookById.rejected, (state, action) => {
@@ -142,6 +145,7 @@ export const bookSlice = createSlice({
             .addCase(updateBook.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
+                state.isError = false
                 state.book = action.payload
                 const index = state.books.findIndex(book => book._id === action.payload._id)
                 if (index !== -1) {
@@ -159,6 +163,7 @@ export const bookSlice = createSlice({
             .addCase(deleteBook.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
+                state.isError = false
                 state.books = state.books.filter(book => book._id !== action.payload)
             })
             .addCase(deleteBook.rejected, (state, action) => {
