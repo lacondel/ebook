@@ -30,7 +30,11 @@ export const addBook = createAsyncThunk('books/add', async (bookData, thunkAPI) 
 // Get books
 export const getBooks = createAsyncThunk('books/getAll', async ({ search, genre, sort }, thunkAPI) => {
     try {
-        return await bookService.getBooks({ search, genre, sort })
+        const { auth } = thunkAPI.getState()
+        if (!auth.user?.token) {
+            throw new Error('Требуется авторизация')
+        }
+        return await bookService.getBooks({ search, genre, sort }, auth.user.token)
     } catch (error) {
         const message =
             (error.response &&

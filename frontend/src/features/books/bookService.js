@@ -2,111 +2,118 @@ import axios from 'axios'
 
 const API_URL = '/api/books'
 
-// Add book
+// Создать новую книгу
 const addBook = async (bookData, token) => {
-    try {
-        const config = {
-            headers: { Authorization: `Bearer ${token}` }
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
         }
+    }
 
+    try {
         const response = await axios.post(API_URL, bookData, config)
         return response.data
-
     } catch (error) {
-        let errorMessage;
         if (error.response) {
-            errorMessage = error.response.data.error || error.response.data.message
+            throw new Error(error.response.data.message || 'Ошибка при создании книги')
         } else if (error.request) {
-            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+            throw new Error('Нет ответа от сервера')
         } else {
-            errorMessage = error.message
+            throw new Error('Ошибка при отправке запроса')
         }
-        throw new Error(errorMessage)
     }
 }
 
-// Get books
-const getBooks = async ({ search, genre, sort }) => {
-    try {
-        const params = new URLSearchParams();
-        if (search) params.append('search', search);
-        if (genre) params.append('genre', genre);
-        if (sort) params.append('sort', sort);
-
-        const response = await axios.get(`${API_URL}?${params.toString()}`);
-        return response.data;
-    } catch (error) {
-        let errorMessage;
-        if (error.response) {
-            errorMessage = error.response.data.error || error.response.data.message
-        } else if (error.request) {
-            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
-        } else {
-            errorMessage = error.message
+// Получить все книги
+const getBooks = async ({ search, genre, sort }, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
         }
-        throw new Error(errorMessage)
     }
-}
 
-// Get book by id
-const getBookById = async (id) => {
     try {
-        const response = await axios.get(`${API_URL}/${id}`);
+        const params = new URLSearchParams()
+        if (search) params.append('search', search)
+        if (genre) params.append('genre', genre)
+        if (sort) params.append('sort', sort)
+
+        const response = await axios.get(`${API_URL}?${params.toString()}`, config)
         return response.data
     } catch (error) {
-        let errorMessage;
         if (error.response) {
-            errorMessage = error.response.data.error || error.response.data.message
+            throw new Error(error.response.data.message || 'Ошибка при получении списка книг')
         } else if (error.request) {
-            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+            throw new Error('Нет ответа от сервера')
         } else {
-            errorMessage = error.message
+            throw new Error('Ошибка при отправке запроса')
         }
-        throw new Error(errorMessage)
     }
 }
 
-// Update book
-const updateBook = async (id, bookData, token) => {
-    try {
-        const config = {
-            headers: { Authorization: `Bearer ${token}` }
+// Получить книгу по ID
+const getBookById = async (bookId, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
         }
+    }
 
-        const response = await axios.put(`${API_URL}/${id}`, bookData, config)
+    try {
+        const response = await axios.get(`${API_URL}/${bookId}`, config)
         return response.data
     } catch (error) {
-        let errorMessage;
         if (error.response) {
-            errorMessage = error.response.data.error || error.response.data.message
+            throw new Error(error.response.data.message || 'Ошибка при получении книги')
         } else if (error.request) {
-            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+            throw new Error('Нет ответа от сервера')
         } else {
-            errorMessage = error.message
+            throw new Error('Ошибка при отправке запроса')
         }
-        throw new Error(errorMessage)
     }
 }
 
-// Delete book
-const deleteBook = async (id, token) => {
-    try {
-        const config = {
-            headers: { Authorization: `Bearer ${token}` }
+// Обновить книгу
+const updateBook = async (bookId, bookData, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
         }
+    }
 
-        const response = await axios.delete(`${API_URL}/${id}`, config)
+    try {
+        const response = await axios.put(`${API_URL}/${bookId}`, bookData, config)
         return response.data
     } catch (error) {
-        let errorMessage;
         if (error.response) {
-            errorMessage = error.response.data.error || error.response.data.message
+            throw new Error(error.response.data.message || 'Ошибка при обновлении книги')
         } else if (error.request) {
-            errorMessage = 'Ошибка сети. Проверьте подключение к интернету'
+            throw new Error('Нет ответа от сервера')
         } else {
-            errorMessage = error.message
+            throw new Error('Ошибка при отправке запроса')
         }
-        throw new Error(errorMessage)
+    }
+}
+
+// Удалить книгу
+const deleteBook = async (bookId, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+
+    try {
+        const response = await axios.delete(`${API_URL}/${bookId}`, config)
+        return response.data
+    } catch (error) {
+        if (error.response) {
+            throw new Error(error.response.data.message || 'Ошибка при удалении книги')
+        } else if (error.request) {
+            throw new Error('Нет ответа от сервера')
+        } else {
+            throw new Error('Ошибка при отправке запроса')
+        }
     }
 }
 

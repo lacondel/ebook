@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { getBooks } from '../features/books/bookSlice'
 import BookListContent from '../component/BookListContent'
@@ -8,17 +8,19 @@ import '../styles/BookList.css'
 
 const BookList = () => {
     const dispatch = useDispatch()
-    const [isInitialLoad, setIsInitialLoad] = useState(true)
 
     const { user } = useSelector((state) => state.auth)
     const { books, isLoading, search, genre, sort } = useSelector((state) => state.books)
 
+    console.log('Current loading state:', isLoading)
+
     const fetchBooks = useCallback(async () => {
         try {
+            console.log('Starting fetch...')
             await dispatch(getBooks({ search, genre, sort })).unwrap()
-            setIsInitialLoad(false)
+            console.log('Fetch completed')
         } catch (error) {
-            console.error(error)
+            console.error('Fetch error:', error)
         }
     }, [dispatch, search, genre, sort])
 
@@ -33,7 +35,7 @@ const BookList = () => {
                 {user?.role === 'admin' && <AddBookButton />}
                 <BookListContent 
                     books={books} 
-                    isLoading={isLoading && isInitialLoad} 
+                    isLoading={isLoading} 
                     user={user} 
                 />
             </section>
