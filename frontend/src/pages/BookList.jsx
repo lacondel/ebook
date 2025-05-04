@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { getBooks } from '../features/books/bookSlice'
 import BookListContent from '../component/BookListContent'
 import BookFilters from '../component/BookFilters'
@@ -8,11 +9,16 @@ import '../styles/BookList.css'
 
 const BookList = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const { user } = useSelector((state) => state.auth)
     const { books, isLoading, search, genre, sort } = useSelector((state) => state.books)
 
-    console.log('Current loading state:', isLoading)
+    useEffect(() => {
+        if (!user) {
+            navigate('/login')
+        }
+    }, [user, navigate])
 
     const fetchBooks = useCallback(async () => {
         try {
@@ -25,8 +31,14 @@ const BookList = () => {
     }, [dispatch, search, genre, sort])
 
     useEffect(() => {
-        fetchBooks()
-    }, [fetchBooks])
+        if (user) {
+            fetchBooks()
+        }
+    }, [fetchBooks, user])
+
+    if (!user) {
+        return null
+    }
 
     return (
         <div className="book-list-page">
