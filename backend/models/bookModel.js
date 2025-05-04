@@ -80,4 +80,10 @@ const bookSchema = mongoose.Schema({
     }
 });
 
+// Создаем индексы для оптимизации поиска, сортировки и фильтрации
+bookSchema.index({ title: 'text' }, { name: 'title_text_search' }); // Текстовый индекс только для поиска по названию
+bookSchema.index({ genre: 1 }); // Индекс для фильтрации по жанру
+bookSchema.index({ title: 1 }); // Индекс для сортировки по названию
+bookSchema.index({ genre: 1, title: 1 }); // Составной индекс для фильтрации по жанру и сортировки по названию
+
 module.exports = mongoose.model('Book', bookSchema);

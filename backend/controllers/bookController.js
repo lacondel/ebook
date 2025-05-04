@@ -11,8 +11,9 @@ const getBooks = asyncHandler(async (req, res) => {
     
     // Build filter object
     const filter = {};
-    if (search) {
-        filter.title = { $regex: search, $options: 'i' };
+    if (search && search.trim() !== '') {
+        // Используем регулярное выражение для поиска по названию
+        filter.title = { $regex: search.trim(), $options: 'i' };
     }
     if (genre && genre !== '') {
         filter.genre = genre;
@@ -27,7 +28,10 @@ const getBooks = asyncHandler(async (req, res) => {
     }
 
     try {
-        const books = await Book.find(filter).sort(sortOptions);
+        const books = await Book.find(filter)
+            .sort(sortOptions)
+            .lean();
+        
         res.status(200).json(books);
     } catch (error) {
         res.status(500);

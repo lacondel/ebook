@@ -12,13 +12,9 @@ const BookList = () => {
     const { user } = useSelector((state) => state.auth)
     const { books, isLoading, search, genre, sort } = useSelector((state) => state.books)
 
-    console.log('Current loading state:', isLoading)
-
     const fetchBooks = useCallback(async () => {
         try {
-            console.log('Starting fetch...')
-            await dispatch(getBooks({ search, genre, sort })).unwrap()
-            console.log('Fetch completed')
+            await dispatch(getBooks({ search, genre, sort }))
         } catch (error) {
             console.error('Fetch error:', error)
         }
